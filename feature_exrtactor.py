@@ -81,10 +81,9 @@ def main():
     net = models.googlenet(pretrained=True).float().cuda()
     net.eval()
     feture_net = nn.Sequential(*list(net.children())[:])
-    print(feture_net)
-    # with h5py.File(args.output_h5, 'w') as h5_f:
-    #     video2features(feture_net, args, h5_f)
-    # view_dataset(args.output_h5)
+    with h5py.File(args.output_h5, 'w') as h5_f:
+        video2features(feture_net, args, h5_f)
+    view_dataset(args.output_h5)
 
 
 if __name__ == "__main__":
