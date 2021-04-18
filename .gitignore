@@ -3,9 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# for data  
+*.mp4
+*.png
+*wandb*
 # C extensions
 *.so
-
+*.idea
 # Distribution / packaging
 .Python
 build/
