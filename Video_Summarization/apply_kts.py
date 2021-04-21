@@ -2,8 +2,8 @@ from kts.cpd_auto import cpd_auto
 import argparse
 import h5py
 import numpy as np
-
-
+from sklearn import preprocessing
+import math
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, required=True)
@@ -16,14 +16,14 @@ def main():
     h5in = h5py.File(args.dataset, 'r')
     for video_name, video_file in h5in.items():
         features = video_file['features'][...].astype(np.float32)
+        fps = int(video_file['fps'][...])
         picks = video_file['picks'][...].astype(np.float32)
         n_frames = video_file['n_frames'][...].astype(np.float32)
         seq_len = features.shape[0]
         kernel = np.matmul(features, features.T)
-        print(kernel)
-        # kernel /= kernel.max()
-        # kernel = np.matmul(features, features.T)
-        change_points, _ = cpd_auto(kernel, seq_len - 1, 1)
+        n = n_frames / fps
+        m = int(math.ceil(n/2.0))
+        change_points, _ = cpd_auto(kernel, m, 1)
         change_points *= 15
         change_points = np.hstack((0, change_points, n_frames))
         begin_frames = change_points[:-1]
