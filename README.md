@@ -1,5 +1,7 @@
 # Automatic-Soccer-Highlights-Generation
 
-Acknowledgments
+##Acknowledgments
+
 I  thank the below open-source repo, which greatly boost my research.
-Thank DSNet for the model, training and evaluation pipeline. And advices about dataset creation
+
+Thank [DSNet](https://github.com/li-plus/DSNet) for the model, training and evaluation pipeline. And advices about dataset creation
