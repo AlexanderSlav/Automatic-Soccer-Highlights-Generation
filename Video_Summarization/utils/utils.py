@@ -1,5 +1,4 @@
-import warnings
-from torchvision import transforms
+from torchvision import transforms,models
 import cv2
 from kts.cpd_auto import cpd_auto
 from PIL import Image
@@ -9,6 +8,8 @@ import numpy as np
 import skvideo.io
 from loguru import logger
 from tqdm import tqdm
+import torch.nn as nn
+from PIL import Image
 
 
 class VideoWriter:
@@ -27,10 +28,15 @@ class VideoWriter:
             self.output_path, outputdict=output_dict, inputdict={"-r": f"{self.fps}"},
         )
 
-    def __call__(self, picked_idxs):
-        for idx, frame in tqdm(enumerate(self.video)):
-            if idx in picked_idxs:
-                self.writer.writeFrame(frame)
+    def __call__(self, picked_idxs=None, summary=None):
+        if summary is not None:
+            for idx, frame in tqdm(enumerate(self.video)):
+                if summary[idx]:
+                    self.writer.writeFrame(frame)
+        elif picked_idxs:
+            for idx, frame in tqdm(enumerate(self.video)):
+                if idx in picked_idxs:
+                    self.writer.writeFrame(frame)
         self.writer.close()
         logger.info(f"Saved as {self.output_path}")
 
@@ -98,3 +104,22 @@ def convert_to_h5_dataset(dataset, output_dataset_name):
         f.create_dataset(name + '/picks', data=data['picks'])
         f.create_dataset(name + '/video_name', data=data['video_name'])
     f.close()
+
+
+class FeautureExtractor:
+    def __init__(self):
+        net = models.googlenet(pretrained=True).float().cuda()
+        net.eval()
+        self.feture_net = nn.Sequential(*list(net.children())[:-2])
+
+    @staticmethod
+    def preprocessing(image):
+        return transform(Image.fromarray(image))
+
+    def forward(self, data):
+        return self.feture_net(data.cuda().unsqueeze(0))
+
+    def __call__(self, image: np.ndarray):
+        preprocessed_data = self.preprocessing(image)
+        features = self.forward(preprocessed_data)
+        return features.squeeze().detach().cpu().numpy()

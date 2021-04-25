@@ -1,0 +1,29 @@
+anchor_scales:
+- 4
+- 8
+- 16
+- 32
+base_model: attention
+cls_loss: focal
+device: cuda
+incomplete_iou_thresh: 0.3
+incomplete_sample_ratio: 1.0
+lambda_ctr: 1.0
+lambda_reg: 1.0
+log_file: log.txt
+lr: 5.0e-05
+max_epoch: 100
+model: anchor-free
+model_dir: models/af_basic
+neg_iou_thresh: 0.0
+neg_sample_ratio: 2.0
+nms_thresh: 0.4
+num_feature: 1024
+num_head: 8
+num_hidden: 128
+pos_iou_thresh: 0.6
+reg_loss: soft-iou
+seed: 12345
+splits:
+- splits/custom_split.yml
+weight_decay: 1.0e-05

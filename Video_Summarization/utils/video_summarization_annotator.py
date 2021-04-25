@@ -41,7 +41,7 @@ class VideoAnnotator:
         n_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
         gtscore = np.zeros(n_frames, dtype=np.float32)
         frame_counter = 0
-        for frame_idx in tqdm(range(21)):
+        for frame_idx in tqdm(range(n_frames - 1)):
             success, frame = video.read()
             if success:
                 frame_counter += 1
@@ -75,7 +75,7 @@ def main():
         video_info = json.load(picks_file)
     annotator = VideoAnnotator(time_step=5, video_picks=video_info)
     summaries = {}
-    for idx, video_file in enumerate(sorted(os.listdir(args.video_dir)[:1])):
+    for idx, video_file in enumerate(sorted(os.listdir(args.video_dir))):
         video_path = os.path.join(args.video_dir, video_file)
         gtscore, user_summary = annotator(video_path, video_file)
         summaries[f'video_{idx}'] = {}
