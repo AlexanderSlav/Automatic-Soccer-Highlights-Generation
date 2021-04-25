@@ -86,8 +86,6 @@ def run():
             n_frames, n_frame_per_seg, picks)
         writer(summary=pred_summ)
 
-        # eval_metric = 'avg' if 'tvsum' in test_key else 'max'
-        # pred_summ = vsumm_helper.downsample_summ(pred_summ)
 
 if __name__ == '__main__':
     run()
