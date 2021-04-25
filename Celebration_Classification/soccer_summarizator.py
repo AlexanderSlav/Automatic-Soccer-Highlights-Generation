@@ -6,7 +6,6 @@ from model_builder import ModelBuilder
 from tqdm import tqdm
 from loguru import logger
 import numpy as np
-import cv2
 classes = ['Celebration', 'Game Moment']
 
 
