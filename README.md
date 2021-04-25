@@ -1,6 +1,6 @@
 # Automatic-Soccer-Highlights-Generation
 
-##Acknowledgments
+## Acknowledgments
 
 I  thank the below open-source repo, which greatly boost my research.
 
