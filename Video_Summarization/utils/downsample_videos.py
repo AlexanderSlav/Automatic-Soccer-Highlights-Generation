@@ -24,6 +24,7 @@ def downsample_videos(video_dir, out_dir):
             logger.info(f'Created the following directory: {out_dir}')
     video_dir_picks = {}
     for idx, video_file in enumerate(sorted(os.listdir(video_dir))):
+        print(video_file)
         video_path = os.path.join(video_dir, video_file)
         output_path = os.path.join(out_dir, video_file)
         writer = VideoWriter(video_path, output_path)
@@ -35,13 +36,16 @@ def downsample_videos(video_dir, out_dir):
             success, frame = video.read()
             if success:
                 if frame_idx % 15 == 0:
+                    cv2.imshow(f'frame_{frame_idx}', frame)
+                    cv2.waitKey(0)
                     picks.append(frame_idx)
-        video_dir_picks[video_name] = {"picks": picks,
-                                       "n_frames": n_frames}
-        writer(picks)
-    output_picks_path = "video_picks.json"
-    with open(output_picks_path, "w") as outfile:
-        json.dump(video_dir_picks, outfile, indent=1, sort_keys=True)
+        print(len(picks))
+    #     video_dir_picks[video_name] = {"picks": picks,
+    #                                    "n_frames": n_frames}
+    #     writer(picks)
+    # output_picks_path = "../video_picks.json"
+    # with open(output_picks_path, "w") as outfile:
+    #     json.dump(video_dir_picks, outfile, indent=1, sort_keys=True)
 
 
 def main():

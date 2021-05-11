@@ -1,0 +1,24 @@
+- test_keys:
+  - datasets/resnet_custom_dataset_goals_train.h5/video_3
+  train_keys:
+  - datasets/resnet_custom_dataset_goals_train.h5/video_1
+  - datasets/resnet_custom_dataset_goals_train.h5/video_0
+  - datasets/resnet_custom_dataset_goals_train.h5/video_2
+- test_keys:
+  - datasets/resnet_custom_dataset_goals_train.h5/video_0
+  train_keys:
+  - datasets/resnet_custom_dataset_goals_train.h5/video_1
+  - datasets/resnet_custom_dataset_goals_train.h5/video_3
+  - datasets/resnet_custom_dataset_goals_train.h5/video_2
+- test_keys:
+  - datasets/resnet_custom_dataset_goals_train.h5/video_2
+  train_keys:
+  - datasets/resnet_custom_dataset_goals_train.h5/video_1
+  - datasets/resnet_custom_dataset_goals_train.h5/video_3
+  - datasets/resnet_custom_dataset_goals_train.h5/video_0
+- test_keys:
+  - datasets/resnet_custom_dataset_goals_train.h5/video_1
+  train_keys:
+  - datasets/resnet_custom_dataset_goals_train.h5/video_0
+  - datasets/resnet_custom_dataset_goals_train.h5/video_3
+  - datasets/resnet_custom_dataset_goals_train.h5/video_2

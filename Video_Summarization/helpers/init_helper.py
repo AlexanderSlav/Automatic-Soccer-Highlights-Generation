@@ -35,12 +35,15 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('model', type=str,
                         choices=('anchor-based', 'anchor-free'))
 
+    # resume training from ckpt
+    parser.add_argument('--saved_ckpt', type=str)
+
     # training & evaluation
     parser.add_argument('--device', type=str, default='cuda',
                         choices=('cuda', 'cpu'))
     parser.add_argument('--seed', type=int, default=12345)
     parser.add_argument('--splits', type=str, nargs='+', required=True)
-    parser.add_argument('--max-epoch', type=int, default=100)
+    parser.add_argument('--max-epoch', type=int, default=500)
     parser.add_argument('--model-dir', type=str, default='../models/model')
     parser.add_argument('--log-file', type=str, default='log.txt')
     parser.add_argument('--lr', type=float, default=5e-5)
@@ -49,11 +52,11 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('--nms-thresh', type=float, default=0.5)
 
     # common model config
-    parser.add_argument('--base-model', type=str, default='attention',
+    parser.add_argument('--base-model', type=str, default='bilstm',
                         choices=['attention', 'lstm', 'linear', 'bilstm',
                                  'gcn'])
     parser.add_argument('--num-head', type=int, default=8)
-    parser.add_argument('--num-feature', type=int, default=1024)
+    parser.add_argument('--num-feature', type=int, default=512)
     parser.add_argument('--num-hidden', type=int, default=128)
 
     # anchor based

@@ -7,7 +7,8 @@ from model_builder import ModelBuilder
 from trainer import Trainer
 import numpy as np
 import random
-
+import datetime
+from loguru import logger
 
 def set_seed():
     torch.manual_seed(42)
@@ -17,15 +18,21 @@ def set_seed():
     random.seed(42)
     np.random.seed(42)
 
-
 wandb.init(project="Celebration_Classification")
 
 
 def main(train_opts):
+    time_now = datetime.datetime.now().strftime("%H:%M")
+    dataset_name = train_args.datapath.split('/')[-1]
+    run_name = f"{dataset_name}_{time_now}"
+    logger.info(run_name)
+    wandb.run.name = run_name
+    wandb.save()
     set_seed()
     wandb.config.update(train_opts)
     # as the baseline, we will use squeezenet lightweight classification model
-    model = ModelBuilder(train_opts.model_name).get_model()
+    model = ModelBuilder(train_opts.model_name,
+                         num_classes=train_opts.class_number).get_model()
     criterion = nn.CrossEntropyLoss()
     optimizer_ft = optim.Adam(model.parameters(), lr=0.0001)
     trainer = Trainer(train_args, model, criterion, optimizer_ft, wandb)

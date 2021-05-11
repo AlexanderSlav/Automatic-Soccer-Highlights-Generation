@@ -6,8 +6,13 @@ import torch
 
 from helpers import init_helper, data_helper, vsumm_helper, bbox_helper
 from modules.model_zoo import get_model
-
-logger = logging.getLogger()
+from utils.utils import *
+import os
+from Celebration_Classification.soccer_summarizator import VideoWriter
+from loguru import logger
+split_name = "resnet_goals_train.yml.0.pt"
+logger.add(f"metrics_results/{split_name[:-3]}_dsnet_summarization.log")
+# ORIGINAL_VIDEOS_PATH = "/home/alexander/HSE_Stuff/Diploma/Datasets/custom/videos/test"
 
 
 def evaluate(model, val_loader, nms_thresh, device):
@@ -18,19 +23,22 @@ def evaluate(model, val_loader, nms_thresh, device):
         for test_key, seq, _, cps, n_frames, nfps, picks, user_summary in val_loader:
             seq_len = len(seq)
             seq_torch = torch.from_numpy(seq).unsqueeze(0).to(device)
-
+            # video_name = os.path.basename(test_key)
+            # video_path = os.path.join(ORIGINAL_VIDEOS_PATH, f"{video_name}.mp4")
             pred_cls, pred_bboxes = model.predict(seq_torch)
 
             pred_bboxes = np.clip(pred_bboxes, 0, seq_len).round().astype(np.int32)
 
             pred_cls, pred_bboxes = bbox_helper.nms(pred_cls, pred_bboxes, nms_thresh)
             pred_summ = vsumm_helper.bbox2summary(
-                seq_len, pred_cls, pred_bboxes, cps, n_frames, nfps, picks)
+                seq_len, pred_cls, pred_bboxes, cps, n_frames, nfps, picks, binary_closing=False)
 
             eval_metric = 'avg' if 'tvsum' in test_key else 'max'
             fscore = vsumm_helper.get_summ_f1score(
                 pred_summ, user_summary, eval_metric)
-
+            # # save video
+            # writer = VideoWriter(video_path, f"summaries/{video_name}_{split_name.split('.')[0]}_dsnet_summmary.mp4")
+            # writer(pred_summ)
             pred_summ = vsumm_helper.downsample_summ(pred_summ)
             diversity = vsumm_helper.get_summ_diversity(pred_summ, seq)
             stats.update(fscore=fscore, diversity=diversity)
@@ -55,7 +63,8 @@ def main():
         stats = data_helper.AverageMeter('fscore', 'diversity')
 
         for split_idx, split in enumerate(splits):
-            ckpt_path = data_helper.get_ckpt_path(args.model_dir, split_path, split_idx)
+            # ckpt_path = data_helper.get_ckpt_path(args.model_dir, split_path, split_idx)
+            ckpt_path = f"models/af_basic/{split_name}"
             state_dict = torch.load(str(ckpt_path),
                                     map_location=lambda storage, loc: storage)
             model.load_state_dict(state_dict)

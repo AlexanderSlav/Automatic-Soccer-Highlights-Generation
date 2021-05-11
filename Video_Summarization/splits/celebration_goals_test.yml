@@ -1,0 +1,4 @@
+- test_keys:
+  - datasets/custom_dataset_celebrations_goals_test.h5/video_0
+  - datasets/custom_dataset_celebrations_goals_test.h5/video_1
+  train_keys: []

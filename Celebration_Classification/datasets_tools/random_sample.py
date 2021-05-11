@@ -6,9 +6,11 @@ import subprocess
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i_d", type=str, help="Input directory with frames to split", default="../custom/game_moment")
-    parser.add_argument("-o_d", type=str, help="Output directory", default="../custom/game_moment_truncated")
-    parser.add_argument("-frames_amount", type=int, help="frames_amount", default=250)
+    parser.add_argument("-i_d", type=str, help="Input directory with frames to split",
+                        default="/home/alexander/HSE_Stuff/Diploma/Datasets/merged_dataset/celebration_only/game_moment")
+    parser.add_argument("-o_d", type=str, help="Output directory",
+                        default="/home/alexander/HSE_Stuff/Diploma/Datasets/merged_dataset/game_moment_truncated")
+    parser.add_argument("-frames_amount", type=int, help="frames_amount", default=350)
     args = parser.parse_args()
     return args
 

@@ -29,7 +29,11 @@ def train(args, split, save_path):
 
     val_set = data_helper.VideoDataset(split['test_keys'])
     val_loader = data_helper.DataLoader(val_set, shuffle=False)
-
+    if args.saved_ckpt:
+        state_dict = torch.load(str(args.saved_ckpt),
+                                map_location=torch.device(args.device))
+        model.load_state_dict(state_dict)
+        print(f'Model loaded from{str(args.saved_ckpt)}')
     for epoch in range(args.max_epoch):
         model.train()
         stats = data_helper.AverageMeter('loss', 'cls_loss', 'loc_loss',

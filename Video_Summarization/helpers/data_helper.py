@@ -88,7 +88,7 @@ class AverageMeter(object):
 
 
 def get_ckpt_dir(model_dir: PathLike) -> Path:
-    return Path(model_dir) / 'checkpoint'
+    return Path(model_dir)   #/ 'checkpoint'
 
 
 def get_ckpt_path(model_dir: PathLike,

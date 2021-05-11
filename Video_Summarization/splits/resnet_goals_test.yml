@@ -1,0 +1,4 @@
+- test_keys:
+  - datasets/resnet_custom_dataset_goals_test.h5/video_1
+  - datasets/resnet_custom_dataset_goals_test.h5/video_0
+  train_keys: []

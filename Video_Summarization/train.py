@@ -4,6 +4,7 @@ from pathlib import Path
 from anchor_based.train import train as train_anchor_based
 from anchor_free.train import train as train_anchor_free
 from helpers import init_helper, data_helper
+import torch
 
 logger = logging.getLogger()
 
@@ -29,7 +30,6 @@ def main():
     model_dir = Path(args.model_dir)
     model_dir.mkdir(parents=True, exist_ok=True)
     data_helper.get_ckpt_dir(model_dir).mkdir(parents=True, exist_ok=True)
-
     trainer = get_trainer(args.model)
 
     data_helper.dump_yaml(vars(args), model_dir / 'args.yml')

@@ -13,7 +13,7 @@ class DSNetAF(nn.Module):
         self.fc1 = nn.Sequential(
             nn.Linear(num_feature, num_hidden),
             nn.ReLU(inplace=True),
-            nn.Dropout(0.5),
+            # nn.Dropout(0.1),
             nn.LayerNorm(num_hidden)
         )
         self.fc_cls = nn.Linear(num_hidden, 1)
@@ -37,7 +37,7 @@ class DSNetAF(nn.Module):
         return pred_cls, pred_loc, pred_ctr
 
     def predict(self, seq):
-        pred_cls, pred_loc, pred_ctr = self(seq)
+        pred_cls, pred_loc, pred_ctr = self.forward(seq)
 
         pred_cls *= pred_ctr
         pred_cls /= pred_cls.max() + 1e-8

@@ -1,10 +1,8 @@
 import argparse
-from pathlib import Path
 import numpy as np
 import torch
 from anchor_free.dsnet_af import DSNetAF
 from helpers import data_helper, vsumm_helper, bbox_helper
-from modules.model_zoo import get_model
 from loguru import logger
 import cv2
 from tqdm import tqdm

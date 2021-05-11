@@ -1,7 +1,5 @@
-from torchvision import transforms,models
-import cv2
-from kts.cpd_auto import cpd_auto
-from PIL import Image
+from torchvision import transforms, models
+from utils.kts.cpd_auto import cpd_auto
 import math
 import h5py
 import numpy as np
@@ -10,6 +8,10 @@ from loguru import logger
 from tqdm import tqdm
 import torch.nn as nn
 from PIL import Image
+import os
+from Celebration_Classification.model_builder import ModelBuilder
+from Celebration_Classification.utils import test_transforms
+import torch
 
 
 class VideoWriter:
@@ -17,7 +19,8 @@ class VideoWriter:
         self.output_path = output_path
         self.video = skvideo.io.vreader(input_video_path)
         self.videometadata = skvideo.io.ffprobe(input_video_path)
-        self.fps = int(self.videometadata['video']['@avg_frame_rate'].split('/')[0])
+        fps_data = self.videometadata['video']['@avg_frame_rate'].split('/')[0]
+        self.fps = int(fps_data) if len(fps_data) == 2 else int(fps_data[:2])
         output_dict = {
             "-vcodec": "libx265",
             "-vf": "format=yuv420p",
@@ -31,6 +34,8 @@ class VideoWriter:
     def __call__(self, picked_idxs=None, summary=None):
         if summary is not None:
             for idx, frame in tqdm(enumerate(self.video)):
+                if idx == len(summary):
+                    break
                 if summary[idx]:
                     self.writer.writeFrame(frame)
         elif picked_idxs:
@@ -39,6 +44,13 @@ class VideoWriter:
                     self.writer.writeFrame(frame)
         self.writer.close()
         logger.info(f"Saved as {self.output_path}")
+
+
+def save_video_from_gt(summary, video_path):
+    video_name = os.path.basename(video_path)
+    video_path = os.path.join(ORIGINAL_VIDEOS_PATH, f"{video_name}.mp4")
+    writer = VideoWriter(video_path, f"{video_name}.mp4")
+    writer(summary=summary)
 
 
 class Rescale(object):
@@ -107,14 +119,26 @@ def convert_to_h5_dataset(dataset, output_dataset_name):
 
 
 class FeautureExtractor:
-    def __init__(self):
-        net = models.googlenet(pretrained=True).float().cuda()
-        net.eval()
-        self.feture_net = nn.Sequential(*list(net.children())[:-2])
+    def __init__(self, net_name: str = "googlenet", num_classes: int = 2, weights_path: str = None):
+        if net_name == "googlenet":
+            net = models.googlenet(pretrained=True).float().cuda()
+            net.eval()
+            self.feture_net = nn.Sequential(*list(net.children())[:-2])
+        elif net_name == "resnet":
+            # build model
+            model = ModelBuilder(net_name, num_classes=num_classes).get_model()
+            model.load_state_dict(torch.load(weights_path))
+            model.eval().to("cuda")
+            self.feture_net = nn.Sequential(*list(model.children())[:-1])
+        else:
+            raise ValueError(f'Invalid feature extractor model {net_name}')
+        self.net_name = net_name
 
-    @staticmethod
-    def preprocessing(image):
-        return transform(Image.fromarray(image))
+    def preprocessing(self, image):
+        if self.net_name == "googlenet":
+            return transform(Image.fromarray(image))
+        elif self.net_name == "resnet":
+            return test_transforms(image=image)['image']
 
     def forward(self, data):
         return self.feture_net(data.cuda().unsqueeze(0))

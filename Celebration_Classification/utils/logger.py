@@ -1,3 +1,5 @@
+from loguru import logger
+
 class Logger:
     def __init__(self, wandb, args, num_samples):
         self.wandb = wandb
@@ -13,4 +15,8 @@ class Logger:
         data = {f"{stage.capitalize()} Accuracy": accuracy[stage].avg,
             f"{stage.capitalize()} Loss": loss[stage].avg}
         data.update(kwargs)
+        logger.info(f"Epoch: {data}")
         self.wandb.log(data)
+
+    def final_accuracy(self, accuracy):
+        logger.info(f"Per class Accuracy: {accuracy}")

@@ -14,11 +14,11 @@ classes = ['Celebration', 'Game Moment']
 def parse_args():
     parser = argparse.ArgumentParser(description='Classify input image')
     parser.add_argument('--input_image', type=str, help='path to input image',
-                        default='/home/alexander/HSE_Stuff/Diploma/Datasets/custom/no_label/no_label_video_3_80.png')
-    parser.add_argument('--input_directory', type=str, help='path to input directory',
-                        default="/home/alexander/HSE_Stuff/Diploma/Datasets/custom/no_label")
+                        default='/home/alexander/Pictures/asdasd.png')
+    parser.add_argument('--input_directory', type=str, help='path to input directory')
     parser.add_argument('--model_path', type=str, help='path to model',
-                        default='wandb/latest-run/files/best_model.pth')
+                        default='/home/alexander/HSE_Stuff/Diploma/Automatic-Soccer-Highlights-Generation'
+                                '/Celebration_Classification/wandb/celebration_only/files/best_model.pth')
     parser.add_argument('--model_name', type=str, help='model name'
                                                        'could be "squeezenet" or "resnet"', default='squeezenet')
     parser.add_argument('--fps_count', action='store_true')

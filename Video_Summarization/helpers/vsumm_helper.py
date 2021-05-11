@@ -2,6 +2,8 @@ from typing import Iterable, List
 
 import numpy as np
 from ortools.algorithms.pywrapknapsack_solver import KnapsackSolver
+import scipy.ndimage as nd
+from loguru import logger
 
 
 def f1_score(pred: np.ndarray, test: np.ndarray) -> float:
@@ -19,6 +21,7 @@ def f1_score(pred: np.ndarray, test: np.ndarray) -> float:
         return 0.0
     precision = overlap / pred.sum()
     recall = overlap / test.sum()
+    logger.info(f"Precision {precision}, Recall {recall}")
     f1 = 2 * precision * recall / (precision + recall)
     return float(f1)
 
@@ -60,7 +63,7 @@ def get_keyshot_summ(pred: np.ndarray,
                      n_frames: int,
                      nfps: np.ndarray,
                      picks: np.ndarray,
-                     proportion: float = 0.15
+                     proportion: float = 0.6
                      ) -> np.ndarray:
     """Generate keyshot-based video summary i.e. a binary vector.
 
@@ -107,15 +110,17 @@ def bbox2summary(seq_len: int,
                  change_points: np.ndarray,
                  n_frames: int,
                  nfps: np.ndarray,
-                 picks: np.ndarray
+                 picks: np.ndarray,
+                 binary_closing: bool = False,
                  ) -> np.ndarray:
     """Convert predicted bounding boxes to summary"""
     score = np.zeros(seq_len, dtype=np.float32)
     for bbox_idx in range(len(pred_bboxes)):
         lo, hi = pred_bboxes[bbox_idx, 0], pred_bboxes[bbox_idx, 1]
         score[lo:hi] = np.maximum(score[lo:hi], [pred_cls[bbox_idx]])
-
     pred_summ = get_keyshot_summ(score, change_points, n_frames, nfps, picks)
+    if binary_closing:
+        pred_summ = nd.binary_closing(pred_summ.astype(np.int32)).astype(bool)
     return pred_summ
 
 

@@ -37,9 +37,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, required=True,
                         help='Path to h5 dataset')
-    parser.add_argument('--save-path', type=str, default='datasets/custom_split.yaml',
+    parser.add_argument('--save-path', type=str, default='splits/resnet_goals_train.yml',
                         help='Path to save generated splits')
-    parser.add_argument('--num-splits', type=int, default=3,
+    parser.add_argument('--num-splits', type=int, default=4,
                         help='How many splits to generate')
     parser.add_argument('--train-ratio', type=float, default=0.6,
                         help='Percentage of training data')
@@ -51,10 +51,13 @@ def main():
     dataset = h5py.File(args.dataset, 'r')
     keys = list(dataset.keys())
     keys = [str(Path(args.dataset) / key) for key in keys]
-
-    num_videos = len(keys)
-    num_train = int(math.ceil(num_videos * args.train_ratio))
-    num_test = num_videos - num_train
+    if args.num_splits == 1:
+        num_test = len(keys)
+        num_videos = len(keys)
+    else:
+        num_videos = len(keys)
+        num_train = int(math.ceil(num_videos * args.train_ratio))
+        num_test = num_videos - num_train
 
     if args.method == 'random':
         splits = make_random_splits(keys, num_test, args.num_splits)
