@@ -14,10 +14,10 @@ class_to_idxs = {
     "celebration_goals": 1
 }
 
-# Set threshold for celebration event to 4 seconds (120 frames)
+# Set threshold for celebration event to 120 frames
 CELEBRATION_DURATION_TRESHOLD = 120
 # Set mean duration for goals event to 150 frames (data from exploratory annotation data analysis)
-GOALS_MEAN_DURATION = 150
+GOALS_MEAN_DURATION = 140
 
 
 def parse_args():
@@ -60,19 +60,17 @@ class VideoWriter:
 
 
 class SoccerSummarizator:
-    def __init__(self, model, device, batch_size: int, offset_time_step: int = 10,
-                 only_celeb: bool = False, only_goals : bool =False, binary_closing: bool = False,
-                 goals_offset: bool = True, classification_type: str = "celebration"):
+    def __init__(self, model, device, batch_size: int, binary_closing: bool = False,
+                 classification_type: str = "celebration"):
+        """
+        classification_type: str  could be "celebration" or "goal"
+        """
         self.model = model
         self.device = device
-        self.offset_time_step = offset_time_step
         self.batch_size = batch_size
         self._batch = []
         self._batch_idxs = []
-        self.only_celeb = only_celeb
-        self.only_goals = only_goals
         self.binary_closing = binary_closing
-        self.get_goals_offset = goals_offset
         self.classification_type = classification_type
 
     def _clean_batch(self):
@@ -123,12 +121,14 @@ class SoccerSummarizator:
         if self.binary_closing:
             self.summary = nd.binary_closing(self.summary).astype(np.int32)
         self.summary = self.upsample_scores_to_original_size(picks, orig_frames_number)
-        if self.get_goals_offset:
-            start_idxs_durations = self.get_offset_to_goals()
+        start_idxs_durations = self.get_event_start_idxs_durations()
+        if self.classification_type == "celebration":
             self.convert_to_goals_only(start_idxs_durations)
+        elif self.classification_type == "goal":
+            self.goal_event_duration_check(start_idxs_durations)
         return self.summary
 
-    def get_offset_to_goals(self):
+    def get_event_start_idxs_durations(self):
         """
         Only for celebration classification case when we want to get goals
         event from detected celebration event by offset n frames back
@@ -149,11 +149,16 @@ class SoccerSummarizator:
             prev = score
         return dict(zip(start_idxs, durations))
 
-    def convert_to_goals_only(self, goals_offset):
-        for start_idx, duration in goals_offset.items():
+    def convert_to_goals_only(self, event_start_idxs_durations):
+        for start_idx, duration in event_start_idxs_durations.items():
             if duration >= CELEBRATION_DURATION_TRESHOLD:
                 self.summary[start_idx-GOALS_MEAN_DURATION:start_idx] = 1
             self.summary[start_idx:start_idx + duration] = 0
+
+    def goal_event_duration_check(self, event_start_idxs_durations):
+        for start_idx, duration in event_start_idxs_durations.items():
+            if duration < GOALS_MEAN_DURATION:
+                self.summary[start_idx:start_idx + duration] = 0
 
     def generate_summary(self, outputs, picks):
         for idx, output in outputs:
@@ -163,15 +168,6 @@ class SoccerSummarizator:
                     self.summary[insert_idx] = 1
                 except:
                     print(f'Not in list {idx}')
-        # # if frame is celebration frame
-        # if torch.argmax(output).item() == 0:
-        #     if self.only_celeb:
-        #         self.summary[idx] = 1
-        #     else:
-        #         # select shot boundaries to include in summary
-        #         left = max(idx - self.offset_time_step * orig_frame_rate, 0)
-        #         right = idx
-        #         self.summary[left:right] = 1
 
 
 def main():
