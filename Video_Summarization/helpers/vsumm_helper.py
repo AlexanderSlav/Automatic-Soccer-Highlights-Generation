@@ -63,7 +63,7 @@ def get_keyshot_summ(pred: np.ndarray,
                      n_frames: int,
                      nfps: np.ndarray,
                      picks: np.ndarray,
-                     proportion: float = 0.6
+                     proportion: float = 0.15
                      ) -> np.ndarray:
     """Generate keyshot-based video summary i.e. a binary vector.
 

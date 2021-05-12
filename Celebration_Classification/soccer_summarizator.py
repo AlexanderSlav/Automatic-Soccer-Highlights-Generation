@@ -1,8 +1,8 @@
 import argparse
 import skvideo.io
-from utils import test_transforms
+from .utils import test_transforms
 import torch
-from model_builder import ModelBuilder
+from .model_builder import ModelBuilder
 from tqdm import tqdm
 from loguru import logger
 import numpy as np
