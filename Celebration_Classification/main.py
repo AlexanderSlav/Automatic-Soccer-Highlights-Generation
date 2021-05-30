@@ -6,7 +6,6 @@ from utils.opts import TrainConfig
 from model_builder import ModelBuilder
 from trainer import Trainer
 import numpy as np
-import random
 import datetime
 from loguru import logger
 
@@ -15,7 +14,6 @@ def set_seed():
     torch.cuda.manual_seed_all(42)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-    random.seed(42)
     np.random.seed(42)
 
 wandb.init(project="Celebration_Classification")

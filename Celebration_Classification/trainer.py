@@ -58,6 +58,12 @@ class Trainer:
             torch.save(self.model.state_dict(), os.path.join(self.logger.wandb.run.dir,
                                                              f"best_model.pth"))
             self.min_accuracy = self.accuracy['test'].avg
+            self.conf_mat = confusion_matrix(self.lbllist.numpy(), self.predlist.numpy())
+            self.predlist = torch.zeros(0, dtype=torch.long, device='cpu')
+            self.lbllist = torch.zeros(0, dtype=torch.long, device='cpu')
+        else:
+            self.predlist = torch.zeros(0, dtype=torch.long, device='cpu')
+            self.lbllist = torch.zeros(0, dtype=torch.long, device='cpu')
         self.logger.epoch_log(self.accuracy, self.loss, 'test')
         self.loss = {stage: meter.reset() for stage, meter in self.loss.items()}
         self.accuracy = {stage: meter.reset() for stage, meter in self.accuracy.items()}
@@ -82,13 +88,13 @@ class Trainer:
             self.training_step()
             self.validation_step()
         # Confusion matrix
-        conf_mat = confusion_matrix(self.lbllist.numpy(), self.predlist.numpy())
+        # conf_mat = confusion_matrix(self.lbllist.numpy(), self.predlist.numpy())
 
         # Per-class accuracy
-        class_accuracy = 100 * conf_mat.diagonal() / conf_mat.sum(1)
+        class_accuracy = 100 * self.conf_mat.diagonal() / self.conf_mat.sum(1)
         self.logger.final_accuracy(class_accuracy)
         classes = self.train_loader.dataset.dataset.classes
-        conf_mat = sns.heatmap(conf_mat, annot=True, fmt='g',
+        conf_mat = sns.heatmap(self.conf_mat, annot=True, fmt='g',
                                        xticklabels=classes,
                                        yticklabels=classes)
         plt.ylabel('True label')
@@ -96,3 +102,4 @@ class Trainer:
         figure = conf_mat.get_figure()
         dataset_name = self.args.datapath.split('/')[-1]
         figure.savefig(f'confusion_matrix_{self.args.model_name}_{dataset_name}.png')
+

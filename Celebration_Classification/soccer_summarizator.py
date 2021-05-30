@@ -10,8 +10,8 @@ import scipy.ndimage as nd
 
 class_to_idxs = {
     "celebration": 0,
-    "goals": 1,
-    "celebration_goals": 1
+    "goals_from_celebration": 0,
+    "goals": 1
 }
 
 # Set threshold for celebration event to 120 frames
@@ -63,7 +63,7 @@ class SoccerSummarizator:
     def __init__(self, model, device, batch_size: int, binary_closing: bool = False,
                  classification_type: str = "celebration"):
         """
-        classification_type: str  could be "celebration" or "goal"
+        classification_type: str  could be "goals_from_celebrations" or "goals"
         """
         self.model = model
         self.device = device
@@ -122,10 +122,12 @@ class SoccerSummarizator:
             self.summary = nd.binary_closing(self.summary).astype(np.int32)
         self.summary = self.upsample_scores_to_original_size(picks, orig_frames_number)
         start_idxs_durations = self.get_event_start_idxs_durations()
-        if self.classification_type == "celebration":
+        if self.classification_type == "goals_from_celebration":
             self.convert_to_goals_only(start_idxs_durations)
-        elif self.classification_type == "goal":
+        elif self.classification_type == "goals":
             self.goal_event_duration_check(start_idxs_durations)
+        else:
+            logger.info("Classifying celebration frames only!")
         return self.summary
 
     def get_event_start_idxs_durations(self):

@@ -12,6 +12,16 @@ from typing import Any
 
 np.random.seed(42)
 INPUT_SIZE = 224
+import numpy as np
+
+
+def set_seed():
+    torch.manual_seed(42)
+    torch.cuda.manual_seed_all(42)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(42)
+
 
 train_transforms = A.Compose([
     A.Resize(INPUT_SIZE, INPUT_SIZE),
@@ -51,7 +61,6 @@ def get_class_distrubution(images, classes, split: str = "train"):
     targets = [image[1] for image in images]
     class_distrib = dict(Counter(targets))
     values = list(class_distrib.values())
-
     # tick_label does the some work as plt.xticks()
     plt.bar(range(len(class_distrib)), values, tick_label=classes)
     plt.savefig(f'class_distribution_{split}.png')
@@ -76,6 +85,7 @@ class AlbumentationsDataset(datasets.ImageFolder):
 
 
 def load_split_train_test(train_opts, valid_size=.2):
+    set_seed()
     datadir = train_opts.datapath
     train = AlbumentationsDataset(datadir, transform=train_transforms)
     test = AlbumentationsDataset(datadir, transform=test_transforms)

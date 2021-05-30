@@ -27,6 +27,7 @@ def evaluate(summarizator, val_loader):
         for test_key, seq, _, cps, n_frames, nfps, picks, user_summary in val_loader:
             video_name = os.path.basename(test_key)
             video_path = os.path.join(ORIGINAL_VIDEOS_PATH, f"{video_name}.mp4")
+            print(video_path)
 
             video = skvideo.io.vreader(video_path)
             videometadata = skvideo.io.ffprobe(video_path)
@@ -38,8 +39,8 @@ def evaluate(summarizator, val_loader):
                 pred_summ, user_summary, eval_metric)
             stats.update(fscore=fscore)
             # save video
-            writer = VideoWriter(video_path, f"summaries/{video_name}_goals_summmary.mp4")
-            writer(summarizator.summary)
+            # writer = VideoWriter(video_path, f"summaries/{video_name}_goals_summmary.mp4")
+            # writer(summarizator.summary)
 
     return stats.fscore, stats.diversity
 
@@ -51,10 +52,11 @@ def main():
     # build model
     model = ModelBuilder(args.model_name, num_classes=2).get_model()
     model.load_state_dict(torch.load(args.model_weights))
-    model = nn.Sequential(*list(model.children())[:-1])
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device).eval()
-    summarizator = SoccerSummarizator(model=model, device=device, batch_size=args.batch_size, binary_closing=False)
+    summarizator = SoccerSummarizator(model=model, device=device,
+                                      batch_size=args.batch_size,
+                                      binary_closing=True, classification_type="goals_from_celebration")
     split_path = Path(args.splits)
     splits = data_helper.load_yaml(split_path)
     stats = data_helper.AverageMeter('fscore', 'diversity')

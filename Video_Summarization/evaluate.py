@@ -11,7 +11,7 @@ import os
 from Celebration_Classification.soccer_summarizator import VideoWriter
 from loguru import logger
 split_name = "goals.yml.3.pt"
-logger.add(f"metrics_results/{split_name[:-3]}_dsnet_summarization__.log")
+logger.add(f"metrics_results/{split_name[:-3]}_dsnet_summarization_pretrained.log")
 # ORIGINAL_VIDEOS_PATH = "/home/alexander/HSE_Stuff/Diploma/Datasets/custom/videos/test"
 
 
@@ -64,7 +64,7 @@ def main():
 
         for split_idx, split in enumerate(splits):
             # ckpt_path = data_helper.get_ckpt_path(args.model_dir, split_path, split_idx)
-            ckpt_path = f"models/af_basic/goals-only/{split_name}"
+            ckpt_path = f"models/af_basic/goals-only-pretrained/{split_name}"
             state_dict = torch.load(str(ckpt_path),
                                     map_location=lambda storage, loc: storage)
             model.load_state_dict(state_dict)
