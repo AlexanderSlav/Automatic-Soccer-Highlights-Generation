@@ -3,7 +3,7 @@ import wandb
 from torch import optim
 from torch import nn
 from utils.opts import TrainConfig
-from model_builder import ModelBuilder
+from soccer_summarizator.model_builder import ModelBuilder
 from trainer import Trainer
 import numpy as np
 import datetime
