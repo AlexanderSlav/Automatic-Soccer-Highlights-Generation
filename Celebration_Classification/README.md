@@ -23,7 +23,7 @@ optional arguments:
   --input_video INPUT_VIDEO
                         path to input video
   --output_video OUTPUT_VIDEO
-                        path to input video
+                        path to output video
   --model_name MODEL_NAME
                         model namecould be "squeezenet" or "resnet"
   --classification_type CLASSIFICATION_TYPE
